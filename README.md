@@ -1,14 +1,14 @@
 # Reading Datasets: Strategies for Interpreting the Politics of Data Signification
 
-# Citation
+## Citation
 
 Coming Soon!
 
-# Overview of Repository
+## Overview of Repository
 
 
 
-# Data Sources
+## Data Sources
 
 Toxic Release Inventory datasets were downloaded from the [EPA's TRI Basic Data Files](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-2019?) for the entire US for the years 1996 to 2010.
 
