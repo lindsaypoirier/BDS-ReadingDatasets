@@ -6,7 +6,7 @@ Coming Soon!
 
 ## Overview of Repository
 
-
+Code for downloading (in the case of Stop and Frisk Data), importing the data, and producing the figures can be found in [BDS-ReadingDatasets-Plots.Rmd](https://github.com/lindsaypoirier/BDS-ReadingDatasets/blob/main/BDS-ReadingDatasets-Plots.Rmd). Toxic Release Inventory files can be found in the datasets folder, and pngs of the plots can be found in the plots folder.  
 
 ## Data Sources
 
