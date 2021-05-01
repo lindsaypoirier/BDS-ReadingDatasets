@@ -1,0 +1,427 @@
+---
+title: "Plots for Reading Datasets: Strategies for Interpreting the Politics of Data Signification"
+author: Lindsay Poirier
+output: 
+  rmdformats::robobook:
+    lightbox: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+## Toxic Release Inventory Plots
+
+### Load TRI data for each X1..YEAR from 1996 to 2010
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+tri_us_1996 <- read.csv("datasets/tri_1996_us.csv")
+tri_us_1997 <- read.csv("datasets/tri_1997_us.csv")
+tri_us_1998 <- read.csv("datasets/tri_1998_us.csv")
+tri_us_1999 <- read.csv("datasets/tri_1999_us.csv")
+tri_us_2000 <- read.csv("datasets/tri_2000_us.csv")
+tri_us_2001 <- read.csv("datasets/tri_2001_us.csv")
+tri_us_2002 <- read.csv("datasets/tri_2002_us.csv")
+tri_us_2003 <- read.csv("datasets/tri_2003_us.csv")
+tri_us_2004 <- read.csv("datasets/tri_2004_us.csv")
+tri_us_2005 <- read.csv("datasets/tri_2005_us.csv")
+tri_us_2006 <- read.csv("datasets/tri_2006_us.csv")
+tri_us_2007 <- read.csv("datasets/tri_2007_us.csv")
+tri_us_2008 <- read.csv("datasets/tri_2008_us.csv")
+tri_us_2009 <- read.csv("datasets/tri_2009_us.csv")
+tri_us_2010 <- read.csv("datasets/tri_2010_us.csv")
+
+tri_us <- rbind(tri_us_1996, tri_us_1997, tri_us_1998, tri_us_1999, tri_us_2000, tri_us_2001, tri_us_2002, tri_us_2003, tri_us_2004, tri_us_2005, tri_us_2006, tri_us_2007, tri_us_2008, tri_us_2009, tri_us_2010)
+
+rm(tri_us_1996, tri_us_1997, tri_us_1998, tri_us_1999, tri_us_2000, tri_us_2001, tri_us_2002, tri_us_2003, tri_us_2004, tri_us_2005, tri_us_2006, tri_us_2007, tri_us_2008, tri_us_2009, tri_us_2010)
+```
+
+### Figure 3: TRI Total Releases in Pounds from 1996 to 2010 
+
+```{r}
+figure3 <- 
+  tri_us %>%
+  mutate(X96..TOTAL.RELEASES = ifelse(X39..UNIT.OF.MEASURE == "Grams",
+                                      X96..TOTAL.RELEASES / 454,
+                                      X96..TOTAL.RELEASES)) %>% 
+  ggplot(aes(x = X1..YEAR, 
+             y = X96..TOTAL.RELEASES)) + 
+  stat_summary(fun = sum, 
+               geom = "line", 
+               group = 1, 
+               size = 0.5) +
+  scale_y_continuous(labels = scales::comma) + 
+  labs(title = "TRI Total Releases in Pounds from 1996 to 2010", 
+       x = "Year", 
+       y = "Total Releases in Pounds") +
+  theme_minimal()  + 
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.text = element_text(size = 5),
+        axis.title = element_text(size = 7))
+
+figure3
+
+ggsave("plots/figure3.png", figure3, width = 6, height = 3)
+```
+
+### Figure 4: TRI Releases from 1996 to 2010 by Industry
+
+```{r}
+figure4 <-
+  tri_us %>%
+  mutate(X96..TOTAL.RELEASES = ifelse(X39..UNIT.OF.MEASURE == "Grams",
+                                      X96..TOTAL.RELEASES / 454,
+                                      X96..TOTAL.RELEASES)) %>% 
+  ggplot(aes(x = X1..YEAR, 
+             y = X96..TOTAL.RELEASES)) + 
+  stat_summary(fun = sum, 
+               geom = "line", 
+               group = 1, 
+               size = 0.25) +
+  facet_wrap(~X16..INDUSTRY.SECTOR) +
+  scale_y_continuous(labels = scales::comma) + 
+  labs(title = "TRI Releases from 1996 to 2010 by Industry", 
+       x = "Year", 
+       y = "Total Releases in Pounds") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.background = element_rect(fill = "#00BfC4"), 
+        strip.text = element_text(size = 4, face = "bold"))
+
+figure4
+
+ggsave("plots/figure4.png", figure4, width = 7, height = 4)
+```
+
+### Figure 5: TRI Releases at Metal Mining Facilities from 1996 to 2010
+
+```{r}
+figure5 <-
+  tri_us %>%
+  mutate(X96..TOTAL.RELEASES = ifelse(X39..UNIT.OF.MEASURE == "Grams",
+                                      X96..TOTAL.RELEASES / 454,
+                                      X96..TOTAL.RELEASES)) %>% 
+  filter(X16..INDUSTRY.SECTOR == "Metal Mining") %>%
+  ggplot(aes(x = X1..YEAR, 
+             y = X96..TOTAL.RELEASES)) + 
+  stat_summary(fun = sum, 
+               geom = "line", 
+               group = 1, 
+               size = 0.25) +
+  facet_wrap(~X8..ST) + #ST is State
+  scale_y_continuous(labels = scales::comma) + 
+  labs(title = "TRI Releases at Metal Mining Facilities from 1996 to 2010",
+       x = "Year", 
+       y = "Total Releases in Pounds") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.background = element_rect(fill = "#00BfC4"), 
+        strip.text = element_text(size = 5, face = "bold"))
+
+figure5
+
+ggsave("plots/figure5.png", figure5, width = 7, height = 4)
+```
+
+### Figure 6: TRI Copper Compound Releases at Arizona Metal Mining Facilities from 1996 to 2010
+
+> Note that all copper compounds are measured in Pounds. 
+
+```{r}
+figure6 <-
+  tri_us %>%
+  filter(X16..INDUSTRY.SECTOR =="Metal Mining" & 
+          X8..ST == "AZ" & 
+          X30..CHEMICAL == "COPPER COMPOUNDS") %>%
+  ggplot(aes(x = X1..YEAR, 
+             y = X96..TOTAL.RELEASES)) + 
+  stat_summary(fun = sum, 
+               geom = "line",
+               group = 1,
+               size = 0.25) + 
+  facet_wrap(~X4..FACILITY.NAME) +
+  scale_y_continuous(labels = scales::comma) + 
+  labs(title = "TRI Copper Compound Releases at Arizona Metal Mining Facilities from 1996 to 2010", 
+       x = "Year", 
+       y = "Total Releases in Pounds") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.background = element_rect(fill = "#00BfC4"), 
+        strip.text = element_text(size = 3, face = "bold"))
+
+figure6
+
+ggsave("plots/figure6.png", figure6, width = 7, height = 4)
+```
+
+### Figure 7: TRI Copper Compound Releases via Surface Impoundment at Arizona Metal Mining Facilities from 1996 to 2010
+
+> Note that all copper compounds are measured in Pounds. 
+
+```{r}
+figure7 <- 
+  tri_us %>%
+  filter(X16..INDUSTRY.SECTOR == "Metal Mining" & 
+           X8..ST == "AZ" & 
+           X30..CHEMICAL == "COPPER COMPOUNDS") %>%
+  gather(key = "SURFACE_RELEASE_TYPE", 
+         value = "SURFACE_RELEASE", 
+         c(X50..5.5.3...SURFACE.IMPNDMNT, 
+           X51..5.5.3A...RCRA.SURFACE.IM, 
+           X52..5.5.3B...OTHER.SURFACE.I)) %>%
+  mutate(SURFACE_RELEASE_TYPE = recode(SURFACE_RELEASE_TYPE, 
+                                       X50..5.5.3...SURFACE.IMPNDMNT = "Surface Impoundment", 
+                                       X51..5.5.3A...RCRA.SURFACE.IM = "RCRA Surface Impoundment", 
+                                       X52..5.5.3B...OTHER.SURFACE.I = "Other Surface Impoundment")) %>%
+  ggplot(aes(x = X1..YEAR, 
+             y = SURFACE_RELEASE, 
+             group = SURFACE_RELEASE_TYPE, 
+             col = SURFACE_RELEASE_TYPE)) + 
+  stat_summary(fun = sum, 
+               geom = "line",
+               size = 0.25) + 
+  facet_wrap(~X4..FACILITY.NAME) +
+  scale_y_continuous(labels = scales::comma) + 
+  labs(title = "TRI Copper Compound Releases via Surface Impoundment at Arizona Facilities from 1996 to 2010", 
+       x = "Year", 
+       y = "Total Releases in Pounds", 
+       col = "Release Reporting Category") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 9, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.background = element_rect(fill = "#00BfC4"), 
+        strip.text = element_text(size = 3, face = "bold"),
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6),
+        legend.position = "bottom")
+
+figure7
+
+ggsave("plots/figure7.png", figure7, width = 7, height = 4)
+```
+
+## NYPD Stop, Question, and Frisk Data
+
+### Load 2011 Stop, Question, and Frisk Data and join to race categories
+
+```{r}
+sqf_url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2011-csv.zip"
+
+temp <- tempfile()
+
+download.file(sqf_url, temp)
+
+sqf_zip <- unzip(temp, "2011.csv")
+
+sqf_2011 <- read.csv(sqf_zip, stringsAsFactors = FALSE) 
+
+sqf_2011_race_cat <- read.csv("datasets/sqf_race_categories.csv", 
+                              stringsAsFactors = FALSE) 
+
+sqf_2011 <- 
+  sqf_2011 %>% 
+  left_join(sqf_2011_race_cat, by = "race")
+
+rm(sqf_url, temp, sqf_zip, sqf_2011_race_cat)
+```
+
+### Add variable for whether a weapon was found on suspect
+
+```{r}
+sqf_2011 <- 
+  sqf_2011 %>%
+  mutate(wpnfound = ifelse((pistol == "Y" |
+                            riflshot == "Y"|
+                            asltweap == "Y"|
+                            knifcuti == "Y"|
+                            machgun == "Y"|
+                            othrweap == "Y"),
+                         "Y",
+                         "N"))
+```
+
+### Figure 9: NYPD Stops by Age in 2011
+
+```{r}
+figure9 <- 
+  sqf_2011 %>%
+  ggplot(aes(x = age)) +
+  geom_histogram(binwidth = 10, 
+                 boundary = 14, 
+                 fill = "#7cae00") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "NYPD Stops by Age in 2011", 
+       x ="Age (in brackets of 10)", 
+       y = "Number of Stops") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure9
+
+ggsave("plots/figure9.png", figure9, width = 6, height = 3)
+```
+
+### Figure 10: NYPD Stops by Age 100+ in 2011
+
+```{r}
+figure10 <- 
+  sqf_2011 %>%
+  filter(age > 100) %>%
+  ggplot(aes(x = age)) +
+  geom_histogram(binwidth = 10, 
+                 boundary = 14, 
+                 fill = "#7cae00") + 
+  xlim(100, 1010) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "NYPD Stops by Age 100+ in 2011", 
+       subtitle = "*In this dataset 999 gets reported when a value is missing and is the highest recorded age value.", 
+       x ="Age (in brackets of 10)", 
+       y = "Number of Stops") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        plot.subtitle = element_text(size = 8),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure10
+
+ggsave("plots/figure10.png", figure10, width = 6, height = 3)
+```
+
+### Figure 12: NYPD Stops by Race in 2011
+
+```{r height = 10}
+figure12 <- 
+  sqf_2011 %>%
+  ggplot(aes(x = str_to_title(race_cat))) + 
+  geom_bar(fill = "#7cae00") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "NYPD Stops by Race in 2011", 
+       x = "Race", 
+       y = "Number of Stops") + 
+  coord_flip() + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure12
+
+ggsave("plots/figure12.png", figure12, width = 6, height = 3)
+```
+
+### Figure 13: Percent NYPD Stops Resulting in a Frisk by Race in 2011
+
+```{r}
+figure13 <-
+  sqf_2011 %>%
+  ggplot(aes(x = str_to_title(race_cat), 
+             fill = frisked)) + 
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Percent Stops Resulting in Frisk by Race in 2011", 
+       x = "Race", 
+       y = "Percent Stops", 
+       fill = "Frisked?") + 
+  coord_flip() +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure13
+
+ggsave("plots/figure13.png", figure13, width = 6, height = 3)
+```
+
+### Figure 14: NYPD Stops Resulting in a Frisk by Race in 2011
+
+```{r}
+figure14 <-
+  sqf_2011 %>%
+  ggplot(aes(x = str_to_title(race_cat), 
+             fill = frisked)) + 
+  geom_bar(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Stops Resulting in Frisk by Race in 2011", 
+       x = "Race", 
+       y = "Stops", 
+       fill = "Frisked?") +
+  coord_flip() + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure14
+
+ggsave("plots/figure14.png", figure14, width = 6, height = 3)
+```
+
+### Figure 15: Percent NYPD Frisks Resulting in Weapon Found by Race in 2011
+
+```{r}
+figure15 <-
+  sqf_2011 %>%
+  filter(frisked == "Y") %>%
+  ggplot(aes(x = str_to_title(race_cat), 
+             fill = wpnfound)) + 
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Percent Frisks Resulting in Weapon Found by Race in 2011", 
+       x = "Race", 
+       y = "Percent Frisks", 
+       fill = "Weapon Found?") + 
+  coord_flip() + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure15
+
+ggsave("plots/figure15.png", figure15, width = 6, height = 3)
+```
+
+### Figure 16: NYPD Frisks Resulting in Weapon Found by Race in 2011
+
+```{r}
+figure16 <-
+  sqf_2011 %>%
+  filter(frisked == "Y") %>%
+  ggplot(aes(x = str_to_title(race_cat), 
+             fill = wpnfound)) + 
+  geom_bar(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Frisks Resulting in Weapon Found by Race in 2011", 
+       x = "Race", 
+       y = "Frisks", 
+       fill = "Weapon Found?") + 
+  coord_flip() + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        axis.title = element_text(size = 8),
+        axis.text = element_text(size = 6))
+
+figure16
+
+ggsave("plots/figure16.png", figure16, width = 6, height = 3)
+```
+
+
+
+
