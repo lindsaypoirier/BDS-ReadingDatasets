@@ -2,7 +2,8 @@
 
 ## Citation
 
-Coming Soon!
+Poirier, Lindsay. “Reading Datasets: Strategies for Interpreting the Politics of Data Signification.” Big Data & Society 8, no. 2 (2021): 1-19. https://doi.org/10.1177/20539517211029322
+
 
 ## Overview of Repository
 
